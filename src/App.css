@@ -78,6 +78,10 @@ body {
   overflow-x: hidden;
 }
 
+body.menu-open {
+  overflow: hidden;
+}
+
 img {
   max-width: 100%;
   height: auto;
@@ -220,12 +224,18 @@ a {
   box-shadow: 0 4px 20px rgba(36, 24, 19, 0.28);
 }
 
+.site-header.menu-open {
+  background: var(--color-brown-dark);
+}
+
 .nav-wrap {
   display: flex;
   align-items: center;
   justify-content: space-between;
   height: var(--header-h);
   gap: 1.2rem;
+  position: relative;
+  z-index: 90;
 }
 
 /* Logo textual */
@@ -261,12 +271,14 @@ a {
 }
 
 /* Navegación desktop */
+.desktop-nav,
 .main-nav {
   display: flex;
   align-items: center;
   gap: 1.8rem;
 }
 
+.desktop-nav a,
 .main-nav a {
   color: rgba(246, 240, 229, 0.82);
   text-decoration: none;
@@ -278,28 +290,38 @@ a {
   outline: none;
 }
 
+.desktop-nav a:hover,
 .main-nav a:hover {
   color: var(--color-white);
 }
 
 /* Pestaña activa: texto marfil + underline terracota/arena editorial (SIN recuadros grandes) */
+.desktop-nav a.active,
 .main-nav a.active {
   color: var(--color-white);
   border-bottom-color: var(--color-terracotta);
   font-weight: 600;
 }
 
+.desktop-nav a:focus-visible,
 .main-nav a:focus-visible {
   outline: 2px solid var(--color-sand-light);
   outline-offset: 4px;
   border-radius: 2px;
 }
 
+.desktop-nav a:focus:not(:focus-visible),
 .main-nav a:focus:not(:focus-visible) {
   outline: none;
 }
 
 .mobile-drawer-btn {
+  display: none;
+}
+
+/* Menú móvil oculto en desktop por defecto */
+.mobile-menu-backdrop,
+.mobile-menu-panel {
   display: none;
 }
 
@@ -1489,61 +1511,121 @@ a {
     display: none;
   }
 
+  .desktop-nav,
   .main-nav {
-    position: absolute;
-    top: var(--header-h);
-    left: 0;
-    right: 0;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0;
-    background: var(--color-brown-dark);
-    border-bottom: 1px solid rgba(246, 240, 229, 0.15);
-    box-shadow: 0 16px 36px rgba(36, 24, 19, 0.4);
-    padding: 0.6rem 1.4rem 1.4rem;
     display: none;
   }
 
-  .main-nav.nav-open {
-    display: flex;
-  }
-
-  .main-nav a {
-    min-height: 44px;
-    display: flex;
-    align-items: center;
-    padding: 0.75rem 0;
-    font-size: 1.02rem;
-    color: rgba(246, 240, 229, 0.9);
-    border-bottom: 1px solid rgba(246, 240, 229, 0.1);
-  }
-
-  .main-nav a.active {
-    color: var(--color-sand-light);
-    border-bottom-color: var(--color-terracotta);
-  }
-
-  .main-nav a:last-of-type {
-    border-bottom: none;
-  }
-
-  .mobile-drawer-btn {
-    display: inline-flex;
-    margin-top: 1rem;
-    width: 100%;
-    min-height: 44px;
-  }
-
-  .nav-backdrop {
+  /* Overlay de fondo: solo oscurece sutilmente, SIN ningún blur */
+  .mobile-menu-backdrop {
     display: block;
     position: fixed;
     top: var(--header-h);
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.55);
-    z-index: 55;
-    backdrop-filter: blur(3px);
+    background: rgba(25, 16, 12, 0.55);
+    z-index: 70;
+    filter: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  /* Panel del menú móvil: sólido (#35251D), por encima del overlay */
+  .mobile-menu-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    position: fixed;
+    top: var(--header-h);
+    left: 0;
+    right: 0;
+    z-index: 80;
+    background: var(--color-brown-dark);
+    border-bottom: 1px solid rgba(246, 240, 229, 0.15);
+    box-shadow: 0 16px 36px rgba(36, 24, 19, 0.45);
+    padding: 0.8rem 1.4rem 1.5rem;
+    max-height: calc(100dvh - var(--header-h));
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    filter: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    opacity: 1;
+  }
+
+  .mobile-menu-links {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  /* Enlaces del menú: 100% nítidos, color marfil/crema, buen contraste, tamaño táctil */
+  .mobile-menu-panel .mobile-menu-links a {
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 0.25rem;
+    font-size: 1.15rem;
+    color: var(--color-ivory);
+    opacity: 1;
+    filter: none;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(246, 240, 229, 0.12);
+    transition: color 0.15s ease;
+    outline: none;
+  }
+
+  .mobile-menu-panel .mobile-menu-links a:hover {
+    color: var(--color-white);
+  }
+
+  .mobile-menu-panel .mobile-menu-links a.active {
+    color: var(--color-sand-light);
+    border-bottom-color: var(--color-terracotta);
+    font-weight: 600;
+  }
+
+  .mobile-menu-panel .mobile-menu-links a:focus-visible {
+    outline: 2px solid var(--color-sand-light);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  .mobile-menu-panel .mobile-menu-links a:last-of-type {
+    border-bottom: none;
+  }
+
+  /* CTA dentro del panel móvil: terracota, nítido y claramente separado */
+  .mobile-menu-panel .mobile-drawer-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1.25rem;
+    width: 100%;
+    min-height: 48px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    background: var(--color-terracotta);
+    border: 1px solid var(--color-terracotta);
+    color: var(--color-white);
+    border-radius: 6px;
+    box-shadow: 0 4px 16px rgba(191, 103, 55, 0.28);
+    opacity: 1;
+    filter: none;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+
+  .mobile-menu-panel .mobile-drawer-btn:hover {
+    background: var(--color-terracotta-hover);
+    border-color: var(--color-terracotta-hover);
+  }
+
+  .mobile-menu-panel .mobile-drawer-btn:focus-visible {
+    outline: 2px solid var(--color-sand-light);
+    outline-offset: 2px;
   }
 
   /* Hero móvil: orden apilado con foto y texto consistentes */
